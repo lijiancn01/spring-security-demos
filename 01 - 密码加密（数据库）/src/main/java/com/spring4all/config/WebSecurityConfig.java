@@ -1,23 +1,19 @@
 package com.spring4all.config;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
-import org.springframework.security.crypto.password.NoOpPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+
+import javax.annotation.Resource;
 
 @EnableWebSecurity
-public class WebSecurityConfig extends WebSecurityConfigurerAdapter{
+public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
+    @Resource
     private DbUserDetailsService dbUserDetailsService;
-
-    @Autowired
-    public void setDbUserDetailsService(DbUserDetailsService dbUserDetailsService){
-        this.dbUserDetailsService = dbUserDetailsService;
-    }
 
     /**
      * 匹配 "/" 路径，不需要权限即可访问
@@ -42,8 +38,16 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter{
      * 添加 UserDetailsService， 实现自定义登录校验
      */
     @Override
-    protected void configure(AuthenticationManagerBuilder builder) throws Exception{
-        builder.userDetailsService(dbUserDetailsService);
+    protected void configure(AuthenticationManagerBuilder builder) throws Exception {
+        builder.userDetailsService(dbUserDetailsService).passwordEncoder(passwordEncoder());
+    }
+
+    /**
+     * 密码加密
+     */
+    @Bean
+    public BCryptPasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
     }
 
 }
