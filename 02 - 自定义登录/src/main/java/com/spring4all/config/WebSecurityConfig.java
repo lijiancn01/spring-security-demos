@@ -6,7 +6,7 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @EnableWebSecurity
-public class WebSecurityConfig extends WebSecurityConfigurerAdapter{
+public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     /**
      * 匹配 "/" 路径，不需要权限即可访问
@@ -23,6 +23,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter{
                 .and()
                 .logout().logoutUrl("/logout").logoutSuccessUrl("/login");
 
+        http.addFilterBefore(new BeforeLoginFilter(), UsernamePasswordAuthenticationFilter.class);
+        http.addFilterAfter(new AfterLoginFilter(), UsernamePasswordAuthenticationFilter.class);
         http.addFilterAt(customFromLoginFilter(), UsernamePasswordAuthenticationFilter.class);
     }
 
@@ -32,5 +34,4 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter{
     private CustomFromLoginFilter customFromLoginFilter() {
         return new CustomFromLoginFilter("/login");
     }
-
 }
